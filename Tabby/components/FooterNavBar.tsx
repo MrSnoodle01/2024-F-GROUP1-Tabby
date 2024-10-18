@@ -35,10 +35,12 @@ const FooterNavBar = () => {
         <Text className="text-white">Favorites</Text>
       </View>
       <View className="w-16 h-16 bg-white rounded-full -top-8">
-        <Image
-          className="w-16 h-16"
-          source={require("@/assets/navbar-images/camera.png")}
-        />
+        <Link href="/Camera">
+          <Image
+            className="w-16 h-16"
+            source={require("@/assets/navbar-images/camera.png")}
+          />
+        </Link>
       </View>
       <View className="absolute right-0 flex-col px-4">
         <Image
