@@ -1,12 +1,11 @@
-import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import { useCameraPermissions } from "expo-camera";
 import { useState, useRef } from "react";
-import { Button, Text, TouchableOpacity, View, Image } from "react-native";
+import { Button, Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 
 export default function App() {
   let cameraRef = useRef();
-  const [facing, setFacing] = useState<CameraType>("front");
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string | null>(null);
 
@@ -25,10 +24,6 @@ export default function App() {
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
-  }
-
-  function toggleCameraFacing() {
-    setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
   let takePicture = async () => {
