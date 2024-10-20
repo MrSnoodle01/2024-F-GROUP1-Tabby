@@ -31,12 +31,11 @@ export default function App() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
+      base64: true,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      console.log(result.assets[0].uri);
     }
   };
 
@@ -46,12 +45,11 @@ export default function App() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
+      base64: true,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      console.log(result.assets[0].uri);
     }
   };
 
@@ -68,8 +66,6 @@ export default function App() {
       <Link href="/Library">
         <Text className="text-white">Cancel</Text>
       </Link>
-
-      {/* {image && <Image source={{ uri: image }} className="w-50 h-50" />} */}
     </View>
   );
 }
