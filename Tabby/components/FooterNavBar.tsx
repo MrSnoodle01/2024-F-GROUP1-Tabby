@@ -7,12 +7,12 @@ const FooterNavBar = () => {
   return (
     <View className="absolute justify-center bottom-0 flex-row items-start h-16 w-screen bg-[#1d232b]">
       <View className="absolute left-0 flex-col">
-        <Link href="/Library">
+        <Link href="/library">
           {" "}
           <Image
             className="w-10 h-10"
             source={
-              pathname === "/Library"
+              pathname === "/library"
                 ? require("@/assets/navbar-images/selectedLibrary.png")
                 : require("@/assets/navbar-images/notSelectedLibrary.png")
             }
