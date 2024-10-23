@@ -63,7 +63,7 @@ export default function App() {
         <Text className="text-white">Use image from camera roll</Text>
       </TouchableOpacity>
 
-      <Link href="/Library">
+      <Link href="/library">
         <Text className="text-white">Cancel</Text>
       </Link>
     </View>

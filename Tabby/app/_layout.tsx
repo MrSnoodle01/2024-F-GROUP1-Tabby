@@ -16,7 +16,7 @@ export default function RootLayout() {
   const pathname = usePathname();
   // flag to check if the current route is in index, welcome page
   const isWelcomePage = pathname === "/";
-  const isTakingPicture = pathname === "/Camera";
+  const isTakingPicture = pathname === "/camera";
   return (
     <SafeAreaProvider>
       <Container>
