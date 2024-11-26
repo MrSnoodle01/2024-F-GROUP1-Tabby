@@ -1,10 +1,11 @@
-import { View, Text, Pressable, Modal, TouchableWithoutFeedback, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, Modal, TouchableWithoutFeedback, ActivityIndicator, FlatList } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Book } from '@/types/book';
 
 interface CameraModalProps {
     closeModal: () => void;
+    onBookSelectionStart: () => void;
 }
 
 type apiReturn = {
@@ -60,10 +61,14 @@ const tempBook4: Book = {
     isFavorite: false,
 };
 
-const CameraModal: React.FC<CameraModalProps> = ({ closeModal }) => {
+const tempBooks: Book[] = [tempBook1, tempBook2, tempBook3, tempBook4];
+
+const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionStart }) => {
     // const [cameraPermission, requestCameraPermission] = useCameraPermissions();
     // use to disable the buttons temporarily when clicking them to prevent multiple clicks
     const [isProcessing, setIsProcessing] = useState(false);
+    // used to determine if the user is currently choosing which book is the correct one
+    const [userChoosing, setUserChoosing] = useState(false);
 
     // Handle taking a picture by requesting permissions before taking the picture if necessary
     const handleTakePicture = async () => {
@@ -81,24 +86,11 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal }) => {
         });
 
         if (!result.canceled) {
-            // console.log("start wait"); // for testing activity indicator
-            // await sleep(5000); // for testing activity indicator
-            // console.log("waited 5 seconds"); // for testing activity indicator
             // await uploadImage(result.assets[0].uri); 
-            closeModal();
-            userPickBook();
+            await userPickBook();
         }
         setIsProcessing(false);
     };
-
-    // for testing activity indicator
-    // async function sleep(ms: number): Promise<void> {
-    //     return new Promise((resolve) => setTimeout(resolve, ms));
-    // }
-
-    const userPickBook = () => {
-
-    }
 
     // Handle picking an image from the gallery by requesting permissions before picking the image if necessary
     const handlePickImage = async () => {
@@ -116,12 +108,29 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal }) => {
         });
 
         if (!result.canceled) {
-            await uploadImage(result.assets[0].uri);
-            closeModal();
-            userPickBook();
+            // await uploadImage(result.assets[0].uri);
+            // setIsProcessing(false);
+            await userPickBook();
         }
         setIsProcessing(false);
     };
+
+    // for testing activity indicator
+    async function sleep(ms: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    const userPickBook = async () => {
+        await setUserChoosing(true);
+
+        // DONT REMOVE THIS SLEEP
+        // idk why but if you remove it then shit breaks
+        await sleep(1000);
+
+        if (onBookSelectionStart) {
+            onBookSelectionStart();
+        }
+    }
 
     // uploads image to scan_cover endpoint
     const uploadImage = async (imageUri: string) => {
@@ -188,7 +197,7 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal }) => {
     }
 
     return (
-        <Modal animationType="fade" transparent visible>
+        <Modal animationType="fade" transparent visible={!userChoosing}>
             <TouchableWithoutFeedback onPress={closeModal}>
                 <View className="flex-1 justify-center items-center">
                     <TouchableWithoutFeedback>
