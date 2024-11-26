@@ -1,6 +1,7 @@
-import { View, Text, Pressable, Modal, TouchableWithoutFeedback } from "react-native";
+import { View, Text, Pressable, Modal, TouchableWithoutFeedback, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from 'axios';
 // import { useCameraPermissions } from "expo-camera";
 
 interface CameraModalProps {
@@ -25,12 +26,11 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal }) => {
             mediaTypes: ['images'],
             allowsEditing: true,
             quality: 1,
-            base64: true,
         });
 
         setIsProcessing(false);
         if (!result.canceled) {
-            const resultBase64 = result.assets[0].base64; // base64 string to send to backend
+            await uploadImage(result.assets[0].uri);
             closeModal();
         }
     };
@@ -48,13 +48,44 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal }) => {
             mediaTypes: ['images'],
             allowsEditing: true,
             quality: 1,
-            base64: true,
         });
 
-        setIsProcessing(false);
         if (!result.canceled) {
-            const resultBase64 = result.assets[0].base64; // base64 string to send to backend
+            await uploadImage(result.assets[0].uri);
             closeModal();
+        }
+        setIsProcessing(false);
+    };
+
+    // uploads image to scan_cover endpoint
+    const uploadImage = async (imageUri: string) => {
+        try {
+            console.log("testing koyeb image");
+
+            // convert image to blob raw data
+            const res = await fetch(imageUri);
+            const blob = await res.blob();
+
+            // fetch scan_cover
+            const response = await fetch('https://just-ulrike-tabby-app-9d270e1b.koyeb.app/books/scan_cover', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/octet-stream',
+                },
+                body: blob,
+            });
+
+            // TODO: if response is good show 4 options for user
+            if (response.ok) {
+                const result = await response.json();
+                console.log("upload successful", result);
+            } else {
+                console.error("error uploading image: ", response.status);
+                const errorText = await response.text();
+                console.error("Error details: ", errorText);
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
         }
     };
 
