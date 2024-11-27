@@ -83,13 +83,13 @@ const FooterNavBar = () => {
           }} />
       )}
       {/*TODO: - Let user choose book then click on confirm button
-               - Figure out what to do when books have duplicate keys
+               - Change logic for when books have duplicate keys(isbns)
                - Get Categories from database
                - Add book to database */}
       {isBookSelectionModalVisible && (
         <Modal animationType="slide" transparent visible>
           <View className="flex-1 justify-center items-center  bg-opacity-50">
-            <View className="bg-white rounded-lg w-80 p-4 space-y-4">
+            <View className="bg-white rounded-lg w-80 p-4 space-y-4 truncate">
               <Text className="text-lg font-bold text-center">Select the correct book</Text>
               <FlatList
                 data={tempBooks}
@@ -98,14 +98,17 @@ const FooterNavBar = () => {
                   <Pressable
                     onPress={() => {
                       console.log("Book selected:", item);
-                      setBookSelectionModalVisible(false); // Close after selection
+                      // TODO: add selection logic here
+                      // setBookSelectionModalVisible(false); // Close after selection
                     }}
                     className="p-2 border rounded-lg mb-2 h-32 flex-row"
                   >
+                    {/* TODO: if no image make default image*/}
                     <Image source={{ uri: item.image }} className='w-1/4 h-full' />
-                    <View className="flex-col h-32 flex-1">
+                    <View className="flex-col h-32 flex-1 truncate">
                       <Text className="text-center">{item.title}</Text>
                       <Text className='text-center'>{item.author}</Text>
+                      <Text className='text-center truncate'>{item.summary}</Text>
                     </View>
                   </Pressable>
                 )}
@@ -117,6 +120,13 @@ const FooterNavBar = () => {
                 onSelect={() => console.log('user chose: ', chosenCategory)}
                 placeholder={'Select which category to add this book'}
               />
+              <Pressable
+                // TODO: add selected book to database
+                onPress={() => setBookSelectionModalVisible(false)}
+                className="p-2 bg-blue-500 rounded items-center"
+              >
+                <Text className="text-white">Confirm</Text>
+              </Pressable>
               <Pressable
                 onPress={() => setBookSelectionModalVisible(false)}
                 className="p-2 bg-red-500 rounded items-center"
