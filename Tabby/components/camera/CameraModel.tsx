@@ -5,7 +5,7 @@ import { Book } from '@/types/book';
 
 interface CameraModalProps {
     closeModal: () => void;
-    onBookSelectionStart: () => void;
+    onBookSelectionStart: (tempBooks: Book[]) => void;
 }
 
 type apiReturn = {
@@ -27,7 +27,7 @@ const tempBook1: Book = {
     author: "joe mama1",
     excerpt: "this is a sick excerpt1",
     summary: "wow sick summary1",
-    image: "hmmm ill work on this1",
+    image: "https://m.media-amazon.com/images/I/81aY1lxk+9L._AC_UF1000,1000_QL80_.jpg",
     isFavorite: false,
 };
 
@@ -37,7 +37,7 @@ const tempBook2: Book = {
     author: "joe mama2",
     excerpt: "this is a sick excerpt2",
     summary: "wow sick summary2",
-    image: "hmmm ill work on this2",
+    image: "https://m.media-amazon.com/images/I/81QuEGw8VPL._AC_UF1000,1000_QL80_.jpg",
     isFavorite: false,
 };
 
@@ -47,7 +47,7 @@ const tempBook3: Book = {
     author: "joe mama3",
     excerpt: "this is a sick excerpt3",
     summary: "wow sick summary3",
-    image: "hmmm ill work on this3",
+    image: "https://m.media-amazon.com/images/I/81aY1lxk+9L._AC_UF1000,1000_QL80_.jpg",
     isFavorite: false,
 };
 
@@ -57,7 +57,7 @@ const tempBook4: Book = {
     author: "joe mama4",
     excerpt: "this is a sick excerpt4",
     summary: "wow sick summary4",
-    image: "hmmm ill work on this4",
+    image: "https://m.media-amazon.com/images/I/81QuEGw8VPL._AC_UF1000,1000_QL80_.jpg",
     isFavorite: false,
 };
 
@@ -128,7 +128,7 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
         await sleep(1000);
 
         if (onBookSelectionStart) {
-            onBookSelectionStart();
+            onBookSelectionStart(tempBooks);
         }
     }
 
@@ -150,7 +150,6 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
                 body: blob,
             });
 
-            // TODO: if response is good show 4 options for user
             if (response.ok) {
                 console.log('success');
                 const result = await response.json();

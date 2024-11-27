@@ -12,47 +12,7 @@ import CameraIcon from "@/assets/navbar-images/camera";
 import CameraModal from "@/components/camera/CameraModel";
 import { Book } from '@/types/book';
 
-const tempBook1: Book = {
-  id: "192083745131",
-  title: "holy hell1",
-  author: "joe mama1",
-  excerpt: "this is a sick excerpt1",
-  summary: "wow sick summary1",
-  image: "https://m.media-amazon.com/images/I/81QuEGw8VPL._AC_UF1000,1000_QL80_.jpg",
-  isFavorite: false,
-};
-
-const tempBook2: Book = {
-  id: "192083745132",
-  title: "holy hell2",
-  author: "joe mama2",
-  excerpt: "this is a sick excerpt2",
-  summary: "wow sick summary2",
-  image: 'https://m.media-amazon.com/images/I/81aY1lxk+9L._AC_UF1000,1000_QL80_.jpg',
-  isFavorite: false,
-};
-
-const tempBook3: Book = {
-  id: "192083745133",
-  title: "holy hell3",
-  author: "joe mama3",
-  excerpt: "this is a sick excerpt3",
-  summary: "wow sick summary3",
-  image: "https://m.media-amazon.com/images/I/81aY1lxk+9L._AC_UF1000,1000_QL80_.jpg",
-  isFavorite: false,
-};
-
-const tempBook4: Book = {
-  id: "192083745134",
-  title: "holy hell4",
-  author: "joe mama4",
-  excerpt: "this is a sick excerpt4",
-  summary: "wow sick summary4",
-  image: "https://m.media-amazon.com/images/I/81aY1lxk+9L._AC_UF1000,1000_QL80_.jpg",
-  isFavorite: false,
-};
-
-const tempBooks: Book[] = [tempBook1, tempBook2, tempBook3, tempBook4];
+let tempBooks: Book[] = [];
 
 const FooterNavBar = () => {
   // set to true to show camera modal
@@ -113,11 +73,15 @@ const FooterNavBar = () => {
       {/* Camera Modal */}
       {isCameraModalVisible && (
         <CameraModal closeModal={() => setCameraModalVisible(false)}
-          onBookSelectionStart={() => {
+          onBookSelectionStart={(returnedBooks: Book[]) => {
+            tempBooks = returnedBooks;
             setCameraModalVisible(false);
             setBookSelectionModalVisible(true);
           }} />
       )}
+      {/*TODO: When user selects book let them choose what category to add it to
+               Also add book to database  
+               Maybe just have selector at top of this modal asking what category*/}
       {isBookSelectionModalVisible && (
         <Modal animationType="slide" transparent visible>
           <View className="flex-1 justify-center items-center  bg-opacity-50">
@@ -132,10 +96,13 @@ const FooterNavBar = () => {
                       console.log("Book selected:", item);
                       setBookSelectionModalVisible(false); // Close after selection
                     }}
-                    className="p-2 border rounded-lg mb-2"
+                    className="p-2 border rounded-lg mb-2 h-32 flex-row"
                   >
-                    <Image source={{ uri: item.image }} className='w-16 h-20' />
-                    <Text className="text-center">{item.title}</Text>
+                    <Image source={{ uri: item.image }} className='w-1/4 h-full' />
+                    <View className="flex-col h-32 flex-1">
+                      <Text className="text-center">{item.title}</Text>
+                      <Text className='text-center'>{item.author}</Text>
+                    </View>
                   </Pressable>
                 )}
               />
