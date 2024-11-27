@@ -81,13 +81,14 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
 
         const result = await ImagePicker.launchCameraAsync({
             mediaTypes: ['images'],
-            allowsEditing: true,
+            allowsEditing: false,
             quality: 1,
         });
 
         if (!result.canceled) {
-            // await uploadImage(result.assets[0].uri); 
-            await userPickBook();
+            const returnedBooks = await uploadImage(result.assets[0].uri);
+            if (returnedBooks)
+                await userPickBook(returnedBooks);
         }
         setIsProcessing(false);
     };
@@ -103,14 +104,14 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
 
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
-            allowsEditing: true,
+            allowsEditing: false,
             quality: 1,
         });
 
         if (!result.canceled) {
-            // await uploadImage(result.assets[0].uri);
-            // setIsProcessing(false);
-            await userPickBook();
+            const returnedBooks = await uploadImage(result.assets[0].uri);
+            if (returnedBooks)
+                await userPickBook(returnedBooks);
         }
         setIsProcessing(false);
     };
@@ -120,7 +121,8 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    const userPickBook = async () => {
+    // Opens modal for user to select correct book
+    const userPickBook = async (bookArr: Book[]) => {
         await setUserChoosing(true);
 
         // DONT REMOVE THIS SLEEP
@@ -128,7 +130,7 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
         await sleep(1000);
 
         if (onBookSelectionStart) {
-            onBookSelectionStart(tempBooks);
+            onBookSelectionStart(bookArr);
         }
     }
 
@@ -150,31 +152,34 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
                 body: blob,
             });
 
+            // add first 4 returned books to an array which are the books that the user can choose from
+            let returnedBooks: Book[] = [];
             if (response.ok) {
                 console.log('success');
                 const result = await response.json();
                 // console.log("result: ", result.results[0])
                 if (result.results[0]) {
                     const book1 = jsonToBook(result.results[0]);
-                    console.log("book1: ", book1);
+                    returnedBooks.push(book1);
                 }
                 if (result.results[1]) {
-                    const book1 = jsonToBook(result.results[1]);
-                    console.log("book2: ", book1);
+                    const book2 = jsonToBook(result.results[1]);
+                    returnedBooks.push(book2);
                 }
                 if (result.results[2]) {
-                    const book1 = jsonToBook(result.results[2]);
-                    console.log("book3: ", book1);
+                    const book3 = jsonToBook(result.results[2]);
+                    returnedBooks.push(book3);
                 }
                 if (result.results[3]) {
-                    const book1 = jsonToBook(result.results[3]);
-                    console.log("book4: ", book1);
+                    const book4 = jsonToBook(result.results[3]);
+                    returnedBooks.push(book4);
                 }
             } else {
                 console.error("error uploading image: ", response.status);
                 const errorText = await response.text();
                 console.error("Error details: ", errorText);
             }
+            return returnedBooks;
         } catch (error) {
             console.error("Error uploading image:", error);
         }

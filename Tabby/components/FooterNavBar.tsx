@@ -1,6 +1,7 @@
 import { View, Pressable, Text, Modal, FlatList, Image } from "react-native";
 import { Link, usePathname } from "expo-router";
 import React, { useState } from "react";
+import { SelectList } from 'react-native-dropdown-select-list'
 import SelectedLibrary from "@/assets/navbar-images/selectedLibrary";
 import NotSelectedLibrary from "@/assets/navbar-images/notSelectedLibrary";
 import SelectedExplore from "@/assets/navbar-images/selectedExplore";
@@ -13,11 +14,13 @@ import CameraModal from "@/components/camera/CameraModel";
 import { Book } from '@/types/book';
 
 let tempBooks: Book[] = [];
+const tempCategories: String[] = ['Fiction', 'Non-Fiction', 'Comedy', 'Narrative', 'Mystery', 'Science Fiction', 'Thriller', 'Biography', 'Poetry'];
 
 const FooterNavBar = () => {
   // set to true to show camera modal
   const [isCameraModalVisible, setCameraModalVisible] = useState(false);
   const [isBookSelectionModalVisible, setBookSelectionModalVisible] = useState(false);
+  const [chosenCategory, setChosenCategory] = useState('')
   const pathname = usePathname();
   const size = 40;
 
@@ -79,14 +82,15 @@ const FooterNavBar = () => {
             setBookSelectionModalVisible(true);
           }} />
       )}
-      {/*TODO: When user selects book let them choose what category to add it to
-               Also add book to database  
-               Maybe just have selector at top of this modal asking what category*/}
+      {/*TODO: - Let user choose book then click on confirm button
+               - Figure out what to do when books have duplicate keys
+               - Get Categories from database
+               - Add book to database */}
       {isBookSelectionModalVisible && (
         <Modal animationType="slide" transparent visible>
           <View className="flex-1 justify-center items-center  bg-opacity-50">
             <View className="bg-white rounded-lg w-80 p-4 space-y-4">
-              <Text className="text-lg font-bold text-center">Select a Book</Text>
+              <Text className="text-lg font-bold text-center">Select the correct book</Text>
               <FlatList
                 data={tempBooks}
                 keyExtractor={(item) => item.id}
@@ -105,6 +109,13 @@ const FooterNavBar = () => {
                     </View>
                   </Pressable>
                 )}
+              />
+              <SelectList
+                setSelected={(val: string) => setChosenCategory(val)}
+                data={tempCategories}
+                search={false}
+                onSelect={() => console.log('user chose: ', chosenCategory)}
+                placeholder={'Select which category to add this book'}
               />
               <Pressable
                 onPress={() => setBookSelectionModalVisible(false)}
