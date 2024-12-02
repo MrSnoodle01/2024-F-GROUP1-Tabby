@@ -76,6 +76,108 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
         setIsProcessing(false);
     };
 
+    // handle user sending in shelf image from camera roll
+    const handlePickShelfImage = async () => {
+        setIsProcessing(true);
+        const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!granted) {
+            setIsProcessing(false);
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            const returnedBooks = await uploadShelfImage(result.assets[0].uri);
+            if (returnedBooks)
+                await userPickBook(returnedBooks);
+        }
+        setIsProcessing(false);
+    };
+    // handle user sending in a shelf image
+    const handleTakeShelfPicture = async () => {
+        setIsProcessing(true);
+        const { granted } = await ImagePicker.requestCameraPermissionsAsync();
+        if (!granted) {
+            setIsProcessing(false);
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            const returnedBooks = await uploadShelfImage(result.assets[0].uri);
+            if (returnedBooks)
+                await userPickBook(returnedBooks);
+        }
+        setIsProcessing(false);
+    };
+
+    // uploads image to scan_shelf endpoint
+    const uploadShelfImage = async (imageUri: string) => {
+        try {
+            console.log("Sending koyeb image");
+            // convert image to blob raw data
+            const res = await fetch(imageUri);
+            const blob = await res.blob();
+            // fetch scan_cover
+            const response = await fetch(`${gpuUrl}/books/scan_shelf`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/octet-stream',
+                },
+                body: blob,
+            });
+            // show user books that were found from shelf
+            let returnedBooks: Book[] = [];
+            if (response.ok) {
+                console.log('success');
+                const result = await response.json();
+                console.log("result: ", result)
+                for (let i = 0; i < result.results.length; i++) {
+                    returnedBooks.push(jsonToBook(result.results[i]));
+                }
+                // if (result.results[0]) {
+                //     const book1 = jsonToBook(result.results[0]);
+                //     returnedBooks.push(book1);
+                // }
+                // if (result.results[1]) {
+                //     const book2 = jsonToBook(result.results[1]);
+                //     if (returnedBooks.findIndex(c => c.isbn === book2.isbn)) {
+                //         returnedBooks.push(book2);
+                //     }
+                // }
+                // if (result.results[2]) {
+                //     const book3 = jsonToBook(result.results[2]);
+                //     if (returnedBooks.findIndex(c => c.isbn === book3.isbn)) {
+                //         returnedBooks.push(book3);
+                //     }
+                // }
+                // if (result.results[3]) {
+                //     const book4 = jsonToBook(result.results[3]);
+                //     if (returnedBooks.findIndex(c => c.isbn === book4.isbn)) {
+                //         returnedBooks.push(book4);
+                //     }
+                // }
+            } else {
+                console.error("error uploading image: ", response.status);
+                const errorText = await response.text();
+                console.error("Error details: ", errorText);
+            }
+            return returnedBooks;
+        } catch (error) {
+            console.error("Catch Error uploading image:", error);
+        }
+    }
+
     // for testing activity indicator
     async function sleep(ms: number): Promise<void> {
         return new Promise((resolve) => setTimeout(resolve, ms));
@@ -182,7 +284,7 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
                                 className={`p-2 rounded items-center bg-blue-500`}
                                 testID="takePictureButton"
                             >
-                                <Text className="text-white">Take Picture</Text>
+                                <Text className="text-white">Take Picture of single book</Text>
                             </Pressable>
                             <Pressable
                                 onPress={handlePickImage}
@@ -190,7 +292,21 @@ const CameraModal: React.FC<CameraModalProps> = ({ closeModal, onBookSelectionSt
                                 className={`p-2 rounded items-center bg-blue-500`}
                                 testID="pickPhotoButton"
                             >
-                                <Text className="text-white">Pick from Camera Roll</Text>
+                                <Text className="text-white">Upload image of a single book</Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={handleTakeShelfPicture}
+                                disabled={isProcessing}
+                                className={`p-2 rounded items-center bg-blue-500`}
+                            >
+                                <Text className="text-white">Take Picture of a book shelf</Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={handlePickShelfImage}
+                                disabled={isProcessing}
+                                className={`p-2 rounded items-center bg-blue-500`}
+                            >
+                                <Text className="text-white">Upload image of a book shelf</Text>
                             </Pressable>
                             <Pressable
                                 onPress={closeModal}
